@@ -43,6 +43,8 @@ dependencies:
   camera_macos: ^0.0.8
   camera_windows: ^0.2.5
   camera: ^0.11.0+2
+  window_manager: ^0.4.0
+  qr_scanner_overlay: ^0.0.2
 
 dev_dependencies:
   flutter_test:
