@@ -6,7 +6,6 @@ import 'package:image_picker_platform_interface/image_picker_platform_interface.
 import 'package:visitor_solution/services/navigator.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/utils/camera_delegate/platform_delegate.dart';
-import 'package:visitor_solution/utils/logger.dart';
 import 'package:visitor_solution/views/components/button.component.dart';
 
 class MacOsCameraController extends PlatformCameraController<CameraMacOSFile?> {

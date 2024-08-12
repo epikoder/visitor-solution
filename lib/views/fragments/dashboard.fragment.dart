@@ -19,7 +19,7 @@ class DashboardFragment extends StatelessWidget {
         StaggeredGrid.count(
           crossAxisCount: 8,
           crossAxisSpacing: 20,
-          children: [
+          children: const [
             StaggeredGridTile.count(
               crossAxisCellCount: 4,
               mainAxisCellCount: 1,
