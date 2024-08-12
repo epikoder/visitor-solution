@@ -21,6 +21,9 @@ class WindowsCameraController extends CameraController
   Future<void> resume() async {
     return await super.resumePreview();
   }
+
+  @override
+  bool isResumable() => true;
 }
 
 class WindowsCameraDelegate extends ImagePickerCameraDelegate {

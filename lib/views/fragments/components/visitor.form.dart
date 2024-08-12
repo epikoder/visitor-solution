@@ -22,11 +22,12 @@ class _Controller extends GetxController {
 
   final formKey = GlobalKey<FormState>();
 
+  final appViewController = Get.find<AppViewController>();
   Future<void> submit() async {
-    if (!formKey.currentState!.validate()) return;
-    Get.find<AppViewController>().setIsLoading();
-    Future.delayed(const Duration(seconds: 3),
-        Get.find<AppViewController>().setIsNotLoading);
+    if (!formKey.currentState!.validate() || image.value == null) return;
+    appViewController.setIsLoading();
+    Future.delayed(
+        const Duration(seconds: 3), appViewController.setIsNotLoading);
   }
 
   @override

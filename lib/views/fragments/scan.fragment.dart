@@ -1,4 +1,3 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,13 +6,13 @@ import 'package:visitor_solution/utils/camera_delegate/macos.dart';
 import 'package:visitor_solution/utils/camera_delegate/platform_delegate.dart';
 import 'package:visitor_solution/utils/camera_delegate/windows.dart';
 import 'package:visitor_solution/utils/logger.dart';
-import 'package:visitor_solution/utils/qr.dart';
 import 'package:visitor_solution/views/components/fragment.component.dart';
 import 'package:visitor_solution/views/components/fragment.appbar.component.dart';
 import 'package:visitor_solution/views/components/button.component.dart';
 import 'package:visitor_solution/views/components/modal.component.dart';
 import 'package:visitor_solution/views/components/scanner.component.dart';
 import 'package:visitor_solution/views/shared/app.shared.dart';
+import 'package:flutter_zxing/flutter_zxing.dart';
 
 class _Controller extends GetxController {
   Rx<PlatformCameraController?> cameraController = Rx(null);
@@ -33,7 +32,7 @@ class _Controller extends GetxController {
   Future<void> startScanner() async {
     cameraController.value = await getCameraController();
     if (cameraController.value is WindowsCameraController) {
-      await (cameraController.value as CameraController).initialize();
+      await (cameraController.value as WindowsCameraController).initialize();
     }
     _scannerStarted.value = true;
 
@@ -44,13 +43,27 @@ class _Controller extends GetxController {
           if (cameraController.value is MacOsCameraController) {
             final pic = await (cameraController.value as MacOsCameraController)
                 .takePicture();
-            final results = await QR.sdk.decodeFile(pic!.url!);
+            if (pic != null) {
+              final results = zx.readBarcode(
+                  pic.bytes!,
+                  DecodeParams(
+                    format: Format.qrCode,
+                  ));
+              final id = results.text;
+              if (id != null) {
+                await stopScanner();
+                findVisitor(id);
+                return false;
+              }
+            }
           } else {
             final pic =
                 await (cameraController.value as WindowsCameraController)
                     .takePicture();
-            final results = await QR.sdk.decodeFile(pic.path);
-            final id = results.firstOrNull?.text;
+            final results =
+                zx.readBarcode(await pic.readAsBytes(), DecodeParams());
+            logger(results.text);
+            final id = results.text;
             if (id != null) {
               await stopScanner();
               findVisitor(id);
@@ -58,7 +71,10 @@ class _Controller extends GetxController {
             }
           }
         } catch (e) {
-          logger(e);
+          logger(e, label: "LISTEN FOR QR ${e.runtimeType}");
+          if (e is Map && e["code"] == "PHOTO_OUTPUT_ERROR") {
+            return true;
+          }
           return false;
         }
         return true;
@@ -106,7 +122,8 @@ class ScanFragmentState extends State<ScanFragment> {
           () => controller.cameraController.value != null &&
                   controller.isScannerStarted
               ? PlatformScannerView(
-                  controller: controller.cameraController.value!)
+                  controller: controller.cameraController,
+                )
               : const SizedBox(),
         ),
         [

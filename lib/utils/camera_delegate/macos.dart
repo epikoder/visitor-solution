@@ -6,15 +6,16 @@ import 'package:image_picker_platform_interface/image_picker_platform_interface.
 import 'package:visitor_solution/services/navigator.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/utils/camera_delegate/platform_delegate.dart';
+import 'package:visitor_solution/utils/logger.dart';
 import 'package:visitor_solution/views/components/button.component.dart';
 
-class MacOsCameraController extends CameraMacOSController
-    implements PlatformCameraController<CameraMacOSFile?> {
-  MacOsCameraController(super.args);
+class MacOsCameraController extends PlatformCameraController<CameraMacOSFile?> {
+  MacOsCameraController(this.inner);
+  final CameraMacOSController inner;
 
   @override
   Future<void> dispose() {
-    return super.destroy();
+    return inner.destroy();
   }
 
   @override
@@ -22,6 +23,14 @@ class MacOsCameraController extends CameraMacOSController
 
   @override
   Future<void> resume() async {}
+
+  @override
+  bool isResumable() => false;
+
+  @override
+  Future<CameraMacOSFile?> takePicture() {
+    return inner.takePicture();
+  }
 }
 
 class MacosCameraDelegate extends ImagePickerCameraDelegate {
@@ -43,40 +52,15 @@ class MacosCameraDelegate extends ImagePickerCameraDelegate {
 
     if (camera == null) return null;
 
-    late MacOsCameraController cameraController;
-    final file = await showCupertinoDialog<XFile?>(
+    final file = await showCupertinoDialog<CameraMacOSFile?>(
       context: NavigatorService.navigatorKey.currentContext!,
-      builder: (context) => Visibility(
-        visible: context.mounted,
-        child: [
-          CameraMacOSView(
-            deviceId: camera.deviceId,
-            cameraMode: CameraMacOSMode.video,
-            onCameraInizialized: (CameraMacOSController controller) {
-              cameraController = controller as MacOsCameraController;
-            },
-          ).constrained(maxHeight: 500),
-          Button(
-            text: "Close",
-            icon: CupertinoIcons.clear,
-            color: Colors.red,
-            onTap: () {
-              Navigator.of(context).pop(null);
-            },
-          ),
-        ]
-            .toColumn(
-              mainAxisAlignment: MainAxisAlignment.center,
-              separator: const SizedBox(
-                height: 10,
-              ),
-            )
-            .center(),
+      builder: (c) => MacosCameraPreview(
+        camera: camera,
       ),
     );
+    if (file == null) return null;
 
-    await cameraController.dispose();
-    return file;
+    return XFile.fromData(file.bytes!);
   }
 
   @override
@@ -132,9 +116,74 @@ class MacosCameraDelegate extends ImagePickerCameraDelegate {
         cameras.length > 1 ? await selectCamera(cameras) : cameras.first;
     if (camera == null) return null;
     return MacOsCameraController(
-      CameraMacOSArguments(
-        size: const Size(400, 400),
+      CameraMacOSController(
+        CameraMacOSArguments(
+          size: const Size(400, 400),
+        ),
       ),
     );
+  }
+}
+
+class MacosCameraPreview extends StatefulWidget {
+  const MacosCameraPreview({
+    super.key,
+    required this.camera,
+  });
+
+  final CameraMacOSDevice camera;
+
+  @override
+  MacosCameraPreviewState createState() => MacosCameraPreviewState();
+}
+
+class MacosCameraPreviewState extends State<MacosCameraPreview> {
+  MacOsCameraController? controller;
+  bool isInitialized = false;
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return [
+      [
+        CameraMacOSView(
+          deviceId: widget.camera.deviceId,
+          cameraMode: CameraMacOSMode.video,
+          onCameraInizialized: (CameraMacOSController controller) {
+            this.controller = MacOsCameraController(controller);
+            setState(() {
+              isInitialized = true;
+            });
+          },
+        ),
+        if (controller != null)
+          CameraActions<CameraMacOSFile?>(controller: controller!)
+              .alignment(Alignment.bottomCenter)
+              .alignment(Alignment.bottomCenter),
+      ].toStack().constrained(maxHeight: 400, maxWidth: 500),
+      if (isInitialized)
+        Button(
+          text: "Close",
+          icon: CupertinoIcons.clear,
+          color: Colors.red,
+          onTap: () {
+            Navigator.of(context).pop(null);
+          },
+        ),
+    ]
+        .toColumn(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          separator: const SizedBox(
+            height: 10,
+          ),
+        )
+        .scrollable()
+        .center();
   }
 }

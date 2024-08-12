@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'package:camera/camera.dart';
-import 'package:camera_macos/camera_macos.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:visitor_solution/utils/camera_delegate/macos.dart';
 import 'package:visitor_solution/utils/camera_delegate/windows.dart';
@@ -14,6 +12,7 @@ abstract class PlatformCameraController<T> {
   Future<void> dispose();
   Future<void> pause();
   Future<void> resume();
+  bool isResumable();
 }
 
 abstract class PlatformCameraDevice<T> {
@@ -54,62 +53,58 @@ class CameraActionsState<T> extends State<CameraActions<T>> {
   @override
   Widget build(BuildContext context) {
     return <Widget>[
-      Visibility(
-          visible: file != null,
-          child: [
-            StyledIconButton(
-              icon: CupertinoIcons.check_mark,
-              onTap: () {
-                Navigator.of(context).pop(file);
-              },
-            ),
-            StyledIconButton(
-              icon: CupertinoIcons.clear,
-              onTap: () async {
-                setState(() {
-                  file = null;
-                });
-                await widget.controller.resume();
-              },
-            ),
-          ].toRow()),
       StyledIconButton(
         icon: CupertinoIcons.camera,
+        iconSize: 18,
         onTap: () async {
           final newFile = await widget.controller.takePicture();
           setState(() {
             file = newFile;
           });
           await widget.controller.pause();
+          if (!widget.controller.isResumable()) {
+            // ignore: use_build_context_synchronously
+            Navigator.of(context).pop(file);
+          }
         },
       ),
-    ].toRow();
+      if (file != null && widget.controller.isResumable())
+        [
+          StyledIconButton(
+            icon: CupertinoIcons.check_mark,
+            iconSize: 18,
+            onTap: () {
+              Navigator.of(context).pop(file);
+            },
+          ),
+          StyledIconButton(
+            icon: CupertinoIcons.clear,
+            bgColor: Colors.red,
+            iconSize: 18,
+            onTap: () async {
+              setState(() {
+                file = null;
+              });
+              await widget.controller.resume();
+            },
+          ),
+        ].toRow(
+          separator: const SizedBox(
+            width: 10,
+          ),
+          mainAxisSize: MainAxisSize.min,
+        )
+    ]
+        .toRow(
+          separator: const SizedBox(
+            width: 10,
+          ),
+          mainAxisSize: MainAxisSize.min,
+        )
+        .padding(vertical: 5, horizontal: 40)
+        .backgroundColor(Colors.white)
+        .clipRRect(all: 10);
   }
-
-  // Future<void> showImagePreview(BuildContext buildContext) async {
-  //   await showCupertinoDialog(
-  //     context: buildContext,
-  //     builder: (c) => [
-  //       StyledIconButton(
-  //         icon: CupertinoIcons.check_mark,
-  //         onTap: () {
-  //           Navigator.of(context).pop(file);
-  //         },
-  //       ),
-  //       StyledIconButton(
-  //         icon: CupertinoIcons.clear,
-  //         onTap: () async {
-  //           setState(() {
-  //             file = null;
-  //           });
-  //           if (widget.pause != null && widget.resume != null) {
-  //             await widget.resume!();
-  //           }
-  //         },
-  //       ),
-  //     ].toRow(),
-  //   );
-  // }
 }
 
 Future<PlatformCameraController?> getCameraController() async {

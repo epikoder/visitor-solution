@@ -10,17 +10,36 @@ import 'package:visitor_solution/utils/camera_delegate/macos.dart';
 import 'package:visitor_solution/utils/camera_delegate/platform_delegate.dart';
 import 'package:visitor_solution/utils/camera_delegate/windows.dart';
 
-class PlatformScannerView extends StatelessWidget {
+class PlatformScannerView extends StatefulWidget {
   const PlatformScannerView({
     super.key,
     required this.controller,
   });
 
-  final PlatformCameraController controller;
+  final Rx<PlatformCameraController?> controller;
+
+  @override
+  PlatformScannerViewState createState() => PlatformScannerViewState();
+}
+
+class PlatformScannerViewState extends State<PlatformScannerView> {
+  CameraMacOSDevice? cameraDevice;
+  bool isInitialized = false;
+
+  @override
+  void initState() {
+    setupCamera();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return (Platform.isWindows
+    if (Platform.isWindows) {
+      assert(widget.controller.value != null,
+          "WindowsCameraController cannot be null");
+    }
+
+    return Platform.isWindows
         ? FittedBox(
             fit: BoxFit.fill,
             child: ClipRect(
@@ -28,7 +47,7 @@ class PlatformScannerView extends StatelessWidget {
                 alignment: Alignment.center,
                 widthFactor: .74,
                 child: CameraPreview(
-                  controller as WindowsCameraController,
+                  (widget.controller).value as WindowsCameraController,
                   child: QRScannerOverlay(
                     borderColor: Colors.white,
                     overlayColor: Colors.transparent,
@@ -42,38 +61,51 @@ class PlatformScannerView extends StatelessWidget {
               ),
             ).clipRRect(all: 20),
           )
-        : FutureBuilder(
-            future: () async {
-              List<CameraMacOSDevice> cameras =
-                  await MacosCameraDelegate.enumerateCameras();
+        : isInitialized
+            ? (cameraDevice != null
+                ? [
+                    FittedBox(
+                      fit: BoxFit.fill,
+                      child: ClipRect(
+                        child: Align(
+                          alignment: Alignment.center,
+                          widthFactor: .9,
+                          heightFactor: .8,
+                          child: CameraMacOSView(
+                            deviceId: cameraDevice!.deviceId,
+                            cameraMode: CameraMacOSMode.video,
+                            onCameraInizialized:
+                                (CameraMacOSController controller) {
+                              widget.controller.value =
+                                  MacOsCameraController(controller);
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    QRScannerOverlay(
+                      borderColor: Colors.black,
+                      overlayColor: Colors.white,
+                      scanAreaWidth: 450,
+                      scanAreaHeight: 250,
+                    ),
+                  ].toStack().constrained(maxHeight: 400, maxWidth: 500)
+                : Styled.text("No Camera Device found"))
+            : const SizedBox();
+  }
 
-              if (cameras.isEmpty) {
-                Get.showSnackbar(const GetSnackBar(
-                  title: "Camera Not found",
-                  message: "No suitable camera found",
-                ));
-                return null;
-              }
+  Future<void> setupCamera() async {
+    if (Platform.isMacOS) {
+      List<CameraMacOSDevice> cameras =
+          await MacosCameraDelegate.enumerateCameras();
 
-              final camera = cameras.length > 1
-                  ? await MacosCameraDelegate.selectCamera(cameras)
-                  : cameras.first;
-              if (camera == null) {
-                return Styled.text("No Camera Device found");
-              }
+      cameraDevice = cameras.length > 1
+          ? await MacosCameraDelegate.selectCamera(cameras)
+          : cameras.firstOrNull;
+    }
 
-              return CameraMacOSView(
-                deviceId: camera.deviceId,
-                cameraMode: CameraMacOSMode.video,
-                onCameraInizialized: (CameraMacOSController controller) {
-                  controller = controller as MacOsCameraController;
-                },
-              );
-            }(),
-            builder: (c, snapshot) => Visibility(
-                visible: snapshot.connectionState == ConnectionState.done &&
-                    snapshot.data != null,
-                child: snapshot.data!),
-          ));
+    setState(() {
+      isInitialized = true;
+    });
   }
 }

@@ -33,7 +33,8 @@ class Button extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
         )
-        .paddingSymmetric(vertical: verticalPadding, horizontal: horizontalPadding)
+        .paddingSymmetric(
+            vertical: verticalPadding, horizontal: horizontalPadding)
         .ripple(enable: onTap != null)
         .gestures(onTap: onTap)
         .decorated(
@@ -82,18 +83,20 @@ class StyledIconButton extends StatelessWidget {
     this.onTap,
     this.color,
     this.bgColor,
+    this.iconSize = 13,
   });
 
   final IconData icon;
   final Color? color;
   final Color? bgColor;
   final VoidCallback? onTap;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
     return Styled.icon(icon)
         .iconColor(onTap != null ? (color ?? Colors.white) : Colors.white)
-        .iconSize(12)
+        .iconSize(iconSize)
         .padding(all: 5)
         .ripple(enable: onTap != null)
         .backgroundColor(
