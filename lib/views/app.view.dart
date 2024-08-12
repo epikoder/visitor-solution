@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/views/components/loader.component.dart';
 import 'package:visitor_solution/views/components/navbar.button.component.dart';
-import 'package:visitor_solution/views/partials/dashboard.partial.dart';
-import 'package:visitor_solution/views/partials/visitors.partial.dart';
+import 'package:visitor_solution/views/fragments/dashboard.fragment.dart';
+import 'package:visitor_solution/views/fragments/scan.fragment.dart';
+import 'package:visitor_solution/views/fragments/visitors.fragment.dart';
 import 'package:visitor_solution/views/shared/app.shared.dart';
 
 class AppView extends StatelessWidget {
@@ -42,9 +43,11 @@ class AppView extends StatelessWidget {
             Obx(() {
               switch (controller.currentRoute.value) {
                 case AppViewRoute.visitors:
-                  return const VisitorsPartial();
+                  return const VisitorsFragment();
+                case AppViewRoute.scan:
+                  return const ScanFragment();
                 default:
-                  return const DashboardPartial();
+                  return const DashboardFragment();
               }
             }),
           ].toRow(),

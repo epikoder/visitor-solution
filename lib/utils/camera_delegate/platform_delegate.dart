@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
+import 'package:camera_macos/camera_macos.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:visitor_solution/utils/camera_delegate/macos.dart';
 import 'package:visitor_solution/utils/camera_delegate/windows.dart';
@@ -11,6 +14,11 @@ abstract class PlatformCameraController<T> {
   Future<void> dispose();
   Future<void> pause();
   Future<void> resume();
+}
+
+abstract class PlatformCameraDevice<T> {
+  String deviceName();
+  String deviceId();
 }
 
 void setUpCameraDelegate() {
@@ -102,4 +110,12 @@ class CameraActionsState<T> extends State<CameraActions<T>> {
   //     ].toRow(),
   //   );
   // }
+}
+
+Future<PlatformCameraController?> getCameraController() async {
+  return Platform.isMacOS
+      ? await MacosCameraDelegate.controller()
+      : Platform.isWindows
+          ? await WindowsCameraDelegate.controller()
+          : null;
 }

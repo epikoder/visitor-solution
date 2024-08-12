@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/utils/size.dart';
 
-class AppBarComponent extends StatelessWidget {
-  const AppBarComponent({
+class FragmentAppBar extends StatelessWidget {
+  const FragmentAppBar({
     super.key,
     required this.title,
     this.leading,

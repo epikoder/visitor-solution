@@ -1,21 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:visitor_solution/views/components/app.page.component.dart';
-import 'package:visitor_solution/views/components/appbar.component.dart';
+import 'package:visitor_solution/views/components/fragment.component.dart';
+import 'package:visitor_solution/views/components/fragment.appbar.component.dart';
 import 'package:visitor_solution/views/components/button.component.dart';
 import 'package:visitor_solution/views/components/modal.component.dart';
-import 'package:visitor_solution/views/partials/components/visitor.form.dart';
+import 'package:visitor_solution/views/fragments/components/visitor.form.dart';
 
-class VisitorsPartial extends StatelessWidget {
-  const VisitorsPartial({super.key});
+class VisitorsFragment extends StatelessWidget {
+  const VisitorsFragment({super.key});
 
   @override
   Widget build(BuildContext context) {
     final modalController = ModalController();
 
-    return AppPage(
-      appBar: AppBarComponent(
+    return Fragment(
+      appBar: FragmentAppBar(
         title: "Visitors",
         actions: [
           Button(

@@ -1,20 +1,24 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 class Button extends StatelessWidget {
-  const Button(
-      {super.key,
-      required this.text,
-      required this.icon,
-      this.onTap,
-      this.color});
+  const Button({
+    super.key,
+    required this.text,
+    required this.icon,
+    this.onTap,
+    this.color,
+    this.horizontalPadding = 10,
+    this.verticalPadding = 5,
+  });
 
   final String text;
   final IconData icon;
   final VoidCallback? onTap;
   final Color? color;
+  final double horizontalPadding;
+  final double verticalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +33,7 @@ class Button extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
         )
-        .paddingSymmetric(vertical: 5, horizontal: 10)
+        .paddingSymmetric(vertical: verticalPadding, horizontal: horizontalPadding)
         .ripple(enable: onTap != null)
         .gestures(onTap: onTap)
         .decorated(

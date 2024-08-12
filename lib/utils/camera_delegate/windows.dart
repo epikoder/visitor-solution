@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +9,7 @@ import 'package:visitor_solution/utils/camera_delegate/platform_delegate.dart';
 import 'package:visitor_solution/views/components/button.component.dart';
 
 class WindowsCameraController extends CameraController
-    implements PlatformCameraController {
+    implements PlatformCameraController<XFile?> {
   WindowsCameraController(super.description, super.resolutionPreset);
 
   @override
@@ -26,19 +24,12 @@ class WindowsCameraController extends CameraController
 }
 
 class WindowsCameraDelegate extends ImagePickerCameraDelegate {
-  WindowsCameraDelegate() {
-    enumerateCameras();
-  }
-
-  List<CameraDescription>? cameras;
-  CameraDescription? defaultCamera;
-
   @override
   Future<XFile?> takePhoto(
       {ImagePickerCameraDelegateOptions options =
           const ImagePickerCameraDelegateOptions()}) async {
-    if (cameras == null) await enumerateCameras();
-    if (cameras!.isEmpty) {
+    final cameras = await enumerateCameras();
+    if (cameras.isEmpty) {
       Get.showSnackbar(const GetSnackBar(
         title: "Camera Not found",
         message: "No suitable camera found",
@@ -46,7 +37,8 @@ class WindowsCameraDelegate extends ImagePickerCameraDelegate {
       return null;
     }
 
-    final camera = await selectCamera();
+    final camera =
+        cameras.length > 1 ? await selectCamera(cameras) : cameras.first;
     if (camera == null) return null;
 
     WindowsCameraController cameraController = WindowsCameraController(
@@ -65,13 +57,12 @@ class WindowsCameraDelegate extends ImagePickerCameraDelegate {
             child: CameraActions(
               controller: cameraController,
             ),
-          ).constrained(maxHeight: 500, maxWidth: 800),
+          ).constrained(maxHeight: 500, maxWidth: 500),
           Button(
             text: "Close",
             icon: CupertinoIcons.clear,
             color: Colors.red,
-            onTap: () async {
-              await cameraController.dispose();
+            onTap: () {
               Navigator.of(context).pop();
             },
           ),
@@ -98,11 +89,12 @@ class WindowsCameraDelegate extends ImagePickerCameraDelegate {
     return Future.value(null);
   }
 
-  Future<void> enumerateCameras() async {
-    cameras = await availableCameras();
+  static Future<List<CameraDescription>> enumerateCameras() async {
+    return await availableCameras();
   }
 
-  Future<CameraDescription?> selectCamera() async {
+  static Future<CameraDescription?> selectCamera(
+      List<CameraDescription> cameras) async {
     return await showCupertinoDialog<CameraDescription?>(
       barrierDismissible: true,
       context: NavigatorService.navigatorKey.currentContext!,
@@ -110,10 +102,9 @@ class WindowsCameraDelegate extends ImagePickerCameraDelegate {
         visible: context.mounted,
         child: CupertinoAlertDialog(
           title: Styled.text("Select Camera device"),
-          content: cameras!
+          content: cameras
               .map(
-                (cam) => Styled.text(
-                        "${cam.name.split('<').first.trim()} - ${cam.lensDirection.name.capitalizeFirst}")
+                (cam) => Styled.text(cam.name.split('<').first.trim())
                     .fontSize(16)
                     .padding(vertical: 5, horizontal: 10)
                     .width(double.infinity)
@@ -135,4 +126,26 @@ class WindowsCameraDelegate extends ImagePickerCameraDelegate {
       ),
     );
   }
+
+  static Future<PlatformCameraController<XFile?>?> controller() async {
+    final cameras = await enumerateCameras();
+    final camera =
+        cameras.length > 1 ? await selectCamera(cameras) : cameras.first;
+    if (camera == null) return null;
+    final controller = WindowsCameraController(camera, ResolutionPreset.low);
+    return controller;
+  }
 }
+
+// class WindowsCameraDevice extends CameraDescription implements PlatformCameraDevice {
+//   @override
+//   String deviceId() {
+//     return super.name;
+//   }
+
+//   @override
+//   String deviceName() {
+//     return super.name;
+//   }
+  
+// }

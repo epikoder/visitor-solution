@@ -21,8 +21,8 @@ class Modal extends StatelessWidget {
   const Modal({
     super.key,
     required this.controller,
-    required this.body,
     required this.header,
+    required this.body,
   });
 
   final ModalController controller;
@@ -39,7 +39,9 @@ class Modal extends StatelessWidget {
             .width(double.infinity)
             .backgroundColor(Colors.white)
             .height(MediaQuery.of(context).size.height)
-            .constrained(maxWidth: MediaQuery.of(context).size.width > 1024 ? 500 : 400, minWidth: 400)
+            .constrained(
+                maxWidth: MediaQuery.of(context).size.width > 1024 ? 500 : 400,
+                minWidth: 400)
             .elevation(10),
       ),
     )

@@ -1,8 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:camera_macos/camera_macos.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:visitor_solution/services/navigator.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -10,7 +9,7 @@ import 'package:visitor_solution/utils/camera_delegate/platform_delegate.dart';
 import 'package:visitor_solution/views/components/button.component.dart';
 
 class MacOsCameraController extends CameraMacOSController
-    implements PlatformCameraController {
+    implements PlatformCameraController<CameraMacOSFile?> {
   MacOsCameraController(super.args);
 
   @override
@@ -29,10 +28,72 @@ class MacosCameraDelegate extends ImagePickerCameraDelegate {
   @override
   Future<XFile?> takePhoto(
       {Object options = const ImagePickerCameraDelegateOptions()}) async {
-    List<CameraMacOSDevice> cameras = await CameraMacOS.instance
-        .listDevices(deviceType: CameraMacOSDeviceType.video);
+    List<CameraMacOSDevice> cameras = await enumerateCameras();
 
-    final camera = await showCupertinoDialog<CameraMacOSDevice?>(
+    if (cameras.isEmpty) {
+      Get.showSnackbar(const GetSnackBar(
+        title: "Camera Not found",
+        message: "No suitable camera found",
+      ));
+      return null;
+    }
+
+    final camera =
+        cameras.length > 1 ? await selectCamera(cameras) : cameras.first;
+
+    if (camera == null) return null;
+
+    late MacOsCameraController cameraController;
+    final file = await showCupertinoDialog<XFile?>(
+      context: NavigatorService.navigatorKey.currentContext!,
+      builder: (context) => Visibility(
+        visible: context.mounted,
+        child: [
+          CameraMacOSView(
+            deviceId: camera.deviceId,
+            cameraMode: CameraMacOSMode.video,
+            onCameraInizialized: (CameraMacOSController controller) {
+              cameraController = controller as MacOsCameraController;
+            },
+          ).constrained(maxHeight: 500),
+          Button(
+            text: "Close",
+            icon: CupertinoIcons.clear,
+            color: Colors.red,
+            onTap: () {
+              Navigator.of(context).pop(null);
+            },
+          ),
+        ]
+            .toColumn(
+              mainAxisAlignment: MainAxisAlignment.center,
+              separator: const SizedBox(
+                height: 10,
+              ),
+            )
+            .center(),
+      ),
+    );
+
+    await cameraController.dispose();
+    return file;
+  }
+
+  @override
+  Future<XFile?> takeVideo(
+      {ImagePickerCameraDelegateOptions options =
+          const ImagePickerCameraDelegateOptions()}) {
+    return Future.value(null);
+  }
+
+  static Future<List<CameraMacOSDevice>> enumerateCameras() async {
+    return await CameraMacOS.instance
+        .listDevices(deviceType: CameraMacOSDeviceType.video);
+  }
+
+  static Future<CameraMacOSDevice?> selectCamera(
+      List<CameraMacOSDevice> cameras) async {
+    return await showCupertinoDialog<CameraMacOSDevice?>(
       barrierDismissible: true,
       context: NavigatorService.navigatorKey.currentContext!,
       builder: (context) => Visibility(
@@ -62,50 +123,18 @@ class MacosCameraDelegate extends ImagePickerCameraDelegate {
         ),
       ),
     );
-
-    if (camera == null) return null;
-
-    late MacOsCameraController cameraController;
-    final file = await showCupertinoDialog<XFile?>(
-      context: NavigatorService.navigatorKey.currentContext!,
-      builder: (context) => Visibility(
-        visible: context.mounted,
-        child: [
-          CameraMacOSView(
-            deviceId: camera.deviceId,
-            cameraMode: CameraMacOSMode.video,
-            onCameraInizialized: (CameraMacOSController controller) {
-              cameraController = controller as MacOsCameraController;
-            },
-          ).constrained(maxHeight: 500),
-          Button(
-            text: "Close",
-            icon: CupertinoIcons.clear,
-            color: Colors.red,
-            onTap: () async {
-              await cameraController.destroy();
-              Navigator.of(context).pop(null);
-            },
-          ),
-        ]
-            .toColumn(
-              mainAxisAlignment: MainAxisAlignment.center,
-              separator: const SizedBox(
-                height: 10,
-              ),
-            )
-            .center(),
-      ),
-    );
-
-    await cameraController.dispose();
-    return file;
   }
 
-  @override
-  Future<XFile?> takeVideo(
-      {ImagePickerCameraDelegateOptions options =
-          const ImagePickerCameraDelegateOptions()}) {
-    return Future.value(null);
+  static Future<PlatformCameraController<CameraMacOSFile?>?>
+      controller() async {
+    final cameras = await enumerateCameras();
+    final camera =
+        cameras.length > 1 ? await selectCamera(cameras) : cameras.first;
+    if (camera == null) return null;
+    return MacOsCameraController(
+      CameraMacOSArguments(
+        size: const Size(400, 400),
+      ),
+    );
   }
 }
