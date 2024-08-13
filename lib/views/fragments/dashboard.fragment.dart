@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/views/components/fragment.component.dart';
 import 'package:visitor_solution/views/components/fragment.appbar.component.dart';
-import 'package:visitor_solution/views/fragments/components/chart.dart';
 
 class DashboardFragment extends StatelessWidget {
   const DashboardFragment({super.key});

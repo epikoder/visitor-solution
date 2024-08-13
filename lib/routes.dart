@@ -4,5 +4,5 @@ import 'package:visitor_solution/views/app.view.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
   "/": (_) => const SplashScreen(),
-  "/home": (_) => AppView(),
+  "/home": (_) => const AppView(),
 };

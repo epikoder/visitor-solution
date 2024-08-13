@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:styled_widget/styled_widget.dart';
-import 'package:visitor_solution/views/components/button.component.dart';
 import 'package:visitor_solution/views/components/fragment.component.dart';
 import 'package:visitor_solution/views/components/fragment.appbar.component.dart';
 import 'package:visitor_solution/views/components/fragment.nav.view.dart';

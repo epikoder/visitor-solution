@@ -10,7 +10,6 @@ import 'package:visitor_solution/utils/client.dart';
 import 'package:visitor_solution/utils/constant.dart';
 import 'package:visitor_solution/utils/helper.dart';
 import 'package:visitor_solution/utils/logger.dart';
-import 'package:visitor_solution/utils/storage.dart';
 import 'package:visitor_solution/views/components/button.component.dart';
 import 'package:visitor_solution/views/components/input.component.dart';
 import 'package:visitor_solution/views/shared/app.shared.dart';

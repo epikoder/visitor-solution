@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/utils/assets.dart';
 

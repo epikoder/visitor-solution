@@ -1,6 +1,5 @@
 import 'package:postgrest/postgrest.dart';
 import 'package:visitor_solution/utils/constant.dart';
-import 'package:visitor_solution/utils/storage.dart';
 
 class Client {
   Client._();

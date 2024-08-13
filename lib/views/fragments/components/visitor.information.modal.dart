@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:printing/printing.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,7 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/models/gender.model.dart';
-import 'package:visitor_solution/models/purpose.model.dart';
 import 'package:visitor_solution/models/visitor.model.dart';
 import 'package:visitor_solution/utils/assets.dart';
 import 'package:visitor_solution/utils/client.dart';
@@ -35,7 +33,7 @@ Widget _buildTile(String text, IconData icon) {
   );
 }
 
-Future<Uint8List?> _getImageByte(key, {double pixel = 3}) async {
+Future<Uint8List?> _getImageByte(key) async {
   final render =
       key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
   if (render == null) {
@@ -43,6 +41,7 @@ Future<Uint8List?> _getImageByte(key, {double pixel = 3}) async {
         duration: const Duration(seconds: 2));
     return null;
   }
+  return null;
 }
 
 printTag(BuildContext buildContext, Visitor visitor) async {

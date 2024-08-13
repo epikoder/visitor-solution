@@ -4,7 +4,6 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/views/components/loader.component.dart';
 import 'package:visitor_solution/views/components/navbar.button.component.dart';
 import 'package:visitor_solution/views/fragments/dashboard.fragment.dart';
-import 'package:visitor_solution/views/fragments/scan.fragment.dart';
 import 'package:visitor_solution/views/fragments/settings.fragment.dart';
 import 'package:visitor_solution/views/fragments/visitors.fragment.dart';
 import 'package:visitor_solution/views/shared/app.shared.dart';
