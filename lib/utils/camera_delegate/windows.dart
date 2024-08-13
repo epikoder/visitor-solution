@@ -36,6 +36,7 @@ class WindowsCameraDelegate extends ImagePickerCameraDelegate {
       Get.showSnackbar(const GetSnackBar(
         title: "Camera Not found",
         message: "No suitable camera found",
+        duration: Duration(seconds: 1),
       ));
       return null;
     }

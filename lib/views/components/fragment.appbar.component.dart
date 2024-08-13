@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -20,8 +19,8 @@ class FragmentAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return <Widget>[
       if (leading != null) leading!,
-      Styled.text(title),
-      if (actions != null) actions!.toRow(),
+      Styled.text(title).fontWeight(FontWeight.w700),
+      if (actions != null) actions!.toRow(separator: const SizedBox(width: 10,)),
     ]
         .toRow(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

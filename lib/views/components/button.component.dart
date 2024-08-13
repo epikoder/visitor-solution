@@ -49,15 +49,25 @@ class StyledButton extends StatelessWidget {
     super.key,
     required this.text,
     this.onTap,
+    this.color,
+    this.horizontalPadding = 10,
+    this.verticalPadding = 15,
+    this.mainAxisSize = MainAxisSize.max,
+    this.borderRadius = 10,
   });
 
   final String text;
   final VoidCallback? onTap;
+  final Color? color;
+  final double horizontalPadding;
+  final double verticalPadding;
+  final MainAxisSize mainAxisSize;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
     return <Widget>[
-      Styled.text(text.toUpperCase()).textColor(Colors.white),
+      Styled.text(text).textColor(Colors.white),
     ]
         .toRow(
           separator: const SizedBox(
@@ -65,13 +75,15 @@ class StyledButton extends StatelessWidget {
           ),
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: mainAxisSize,
         )
-        .paddingSymmetric(vertical: 15, horizontal: 10)
+        .paddingSymmetric(
+            vertical: verticalPadding, horizontal: horizontalPadding)
         .ripple(enable: onTap != null)
         .gestures(onTap: onTap)
         .decorated(
-          color: onTap != null ? Colors.blue.shade400 : Colors.grey,
-          borderRadius: BorderRadius.circular(10),
+          color: onTap != null ? (color ?? Colors.blue.shade400) : Colors.grey,
+          borderRadius: BorderRadius.circular(borderRadius),
         );
   }
 }

@@ -40,8 +40,9 @@ class Modal extends StatelessWidget {
             .backgroundColor(Colors.white)
             .height(MediaQuery.of(context).size.height)
             .constrained(
-                maxWidth: MediaQuery.of(context).size.width > 1024 ? 500 : 400,
-                minWidth: 400)
+              maxWidth: MediaQuery.of(context).size.width > 1024 ? 500 : 400,
+              minWidth: 400,
+            )
             .elevation(10),
       ),
     )

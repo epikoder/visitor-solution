@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/utils/size.dart';
 import 'package:visitor_solution/views/components/fragment.appbar.component.dart';
-import 'package:visitor_solution/views/components/modal.component.dart';
 
 class Fragment extends StatelessWidget {
   const Fragment({
@@ -15,7 +14,7 @@ class Fragment extends StatelessWidget {
 
   final FragmentAppBar appBar;
   final Widget body;
-  final Modal? modal;
+  final Widget? modal;
 
   @override
   Widget build(BuildContext context) {

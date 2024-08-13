@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-enum AppViewRoute { dashboard, visitors, scan }
+enum AppViewRoute { dashboard, visitors, settings }
 
 class AppViewController extends GetxController {
   final currentRoute = AppViewRoute.dashboard.obs;

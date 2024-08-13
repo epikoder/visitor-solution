@@ -5,6 +5,7 @@ import 'package:visitor_solution/views/components/loader.component.dart';
 import 'package:visitor_solution/views/components/navbar.button.component.dart';
 import 'package:visitor_solution/views/fragments/dashboard.fragment.dart';
 import 'package:visitor_solution/views/fragments/scan.fragment.dart';
+import 'package:visitor_solution/views/fragments/settings.fragment.dart';
 import 'package:visitor_solution/views/fragments/visitors.fragment.dart';
 import 'package:visitor_solution/views/shared/app.shared.dart';
 
@@ -20,23 +21,30 @@ class AppView extends StatelessWidget {
         body: [
           [
             [
-              const NavbarButtonComponent(
-                route: AppViewRoute.dashboard,
-                icon: Icons.home_outlined,
+              [
+                const NavbarButtonComponent(
+                  route: AppViewRoute.dashboard,
+                  icon: Icons.home_outlined,
+                ),
+                const NavbarButtonComponent(
+                  route: AppViewRoute.visitors,
+                  icon: Icons.people_outline,
+                ),
+              ].toColumn(
+                separator: const SizedBox(
+                  height: 10,
+                ),
               ),
               const NavbarButtonComponent(
-                route: AppViewRoute.visitors,
-                icon: Icons.people_outline,
-              ),
-              const NavbarButtonComponent(
-                route: AppViewRoute.scan,
-                icon: Icons.camera_alt_outlined,
+                route: AppViewRoute.settings,
+                icon: Icons.settings,
               ),
             ]
                 .toColumn(
                   separator: const SizedBox(
-                    height: 10,
+                    height: 40,
                   ),
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 )
                 .paddingSymmetric(vertical: 20, horizontal: 10)
                 .border(right: 1, color: Colors.grey.shade300),
@@ -44,8 +52,8 @@ class AppView extends StatelessWidget {
               switch (controller.currentRoute.value) {
                 case AppViewRoute.visitors:
                   return const VisitorsFragment();
-                case AppViewRoute.scan:
-                  return const ScanFragment();
+                case AppViewRoute.settings:
+                  return SettingFragment();
                 default:
                   return const DashboardFragment();
               }

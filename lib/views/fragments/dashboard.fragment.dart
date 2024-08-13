@@ -16,23 +16,42 @@ class DashboardFragment extends StatelessWidget {
         title: "Dashboard",
       ),
       body: <Widget>[
-        StaggeredGrid.count(
-          crossAxisCount: 8,
-          crossAxisSpacing: 20,
-          children: [
-            StaggeredGridTile.count(
-              crossAxisCellCount: 4,
-              mainAxisCellCount: 1,
-              child: Chart(),
+        [
+          [
+            Styled.text("Hola!").fontSize(22).textColor(Colors.grey.shade500),
+            Styled.text("Welcome to visitor solution")
+                .fontSize(22)
+                .textColor(Colors.grey.shade500)
+          ].toColumn(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            separator: const SizedBox(
+              height: 20,
             ),
-            StaggeredGridTile.count(
-              crossAxisCellCount: 4,
-              mainAxisCellCount: 1,
-              child: Chart(),
-            ),
-          ],
-        ).paddingSymmetric(horizontal: 10, vertical: 50).scrollable()
-      ].toColumn(),
+          )
+        ].toRow(),
+        // StaggeredGrid.count(
+        //   crossAxisCount: 8,
+        //   crossAxisSpacing: 20,
+        //   children: [
+        // StaggeredGridTile.count(
+        //   crossAxisCellCount: 4,
+        //   mainAxisCellCount: 1,
+        //   child: Chart(),
+        // ),
+        // StaggeredGridTile.count(
+        //   crossAxisCellCount: 4,
+        //   mainAxisCellCount: 1,
+        //   child: Chart(),
+        // ),
+        // ],
+        // ).paddingSymmetric(horizontal: 10, vertical: 50).scrollable()
+      ]
+          .toColumn(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+          )
+          .padding(horizontal: 20, vertical: 20),
     );
   }
 }

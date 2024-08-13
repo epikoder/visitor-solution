@@ -2,7 +2,7 @@ enum Gender {
   male,
   female;
 
-  Gender fromString(String s) {
+  static Gender fromString(String s) {
     return s.toLowerCase() == "male" ? Gender.male : Gender.female;
   }
 

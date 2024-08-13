@@ -1,11 +1,9 @@
-import 'dart:ffi';
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:visitor_solution/utils/logger.dart';
 import 'package:visitor_solution/views/components/button.component.dart';
 
 class TextInput extends StatelessWidget {
@@ -15,12 +13,14 @@ class TextInput extends StatelessWidget {
     required this.label,
     this.isRequired,
     this.validator,
+    this.onEditingComplete,
   });
 
   final TextEditingController controller;
   final String label;
   final bool? isRequired;
   final String? Function(String?)? validator;
+  final VoidCallback? onEditingComplete;
 
   String? _validator(String? text) {
     if (text == null || text.isEmpty) return "field is required";
@@ -45,6 +45,51 @@ class TextInput extends StatelessWidget {
       style: const TextStyle(fontSize: 14),
       maxLines: 1,
       validator: _validator,
+      onEditingComplete: onEditingComplete,
+    );
+  }
+}
+
+class TextAreaInput extends StatelessWidget {
+  const TextAreaInput({
+    super.key,
+    required this.controller,
+    this.isRequired,
+    this.validator,
+    this.onEditingComplete,
+    required this.placeholder,
+  });
+
+  final TextEditingController controller;
+  final bool? isRequired;
+  final String? placeholder;
+  final String? Function(String?)? validator;
+  final VoidCallback? onEditingComplete;
+
+  String? _validator(String? text) {
+    if (text == null || text.isEmpty) return "field is required";
+    return validator != null ? validator!(text) : null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(
+            color: Colors.black12,
+            width: .5,
+          ),
+        ),
+        hintText: placeholder,
+      ),
+      style: const TextStyle(fontSize: 14),
+      validator: _validator,
+      minLines: 4,
+      maxLines: 8,
+      onEditingComplete: onEditingComplete,
     );
   }
 }
@@ -122,7 +167,7 @@ class DateTimePicker extends StatelessWidget {
                   firstDate: DateTime.now(),
                   lastDate: DateTime(DateTime.now().year + 1),
                   onDatePickerModeChange: (value) {
-                    print(value);
+                    logger(value);
                   }));
               if (date != null) {
                 this.date.value = date;
@@ -172,12 +217,12 @@ class DateTimePicker extends StatelessWidget {
 class RxImagePicker extends StatelessWidget {
   const RxImagePicker({
     super.key,
-    required this.bytes,
+    required this.file,
     required this.label,
     this.isRequired = false,
   });
 
-  final Rx<Uint8List?> bytes;
+  final Rx<XFile?> file;
   final String label;
   final bool isRequired;
 
@@ -213,7 +258,7 @@ class RxImagePicker extends StatelessWidget {
     );
     if (source == null) return;
     final file = await ImagePicker().pickImage(source: source);
-    if (file != null) bytes.value = await file.readAsBytes();
+    if (file != null) this.file.value = file;
   }
 
   @override
@@ -221,9 +266,20 @@ class RxImagePicker extends StatelessWidget {
     return [
       [
         Obx(
-          () => (bytes.value != null
-                  ? Image.memory(bytes.value!, height: 300,)
-                      .gestures(onTap: () => selectPhoto(context))
+          () => (file.value != null
+                  ? FutureBuilder(
+                      future: () async {
+                        return await file.value!.readAsBytes();
+                      }(),
+                      builder: (context, snapshot) =>
+                          snapshot.connectionState == ConnectionState.done &&
+                                  snapshot.data != null
+                              ? Image.memory(
+                                  snapshot.data!,
+                                  height: 300,
+                                ).gestures(onTap: () => selectPhoto(context))
+                              : const SizedBox(),
+                    )
                   : Styled.widget(
                       child: [
                         Styled.text("Select image").fontSize(14),
@@ -246,7 +302,7 @@ class RxImagePicker extends StatelessWidget {
               .decorated(
                 border: Border.all(
                   color: isRequired
-                      ? (bytes.value != null
+                      ? (file.value != null
                           ? Colors.black54
                           : Colors.red.shade500)
                       : Colors.black54,
@@ -256,12 +312,12 @@ class RxImagePicker extends StatelessWidget {
         ),
         Obx(
           () => Visibility(
-            visible: bytes.value != null,
+            visible: file.value != null,
             child: Button(
               text: "Remove photo",
               icon: CupertinoIcons.trash,
               color: Colors.red,
-              onTap: () => bytes.value = null,
+              onTap: () => file.value = null,
             ),
           ),
         )
