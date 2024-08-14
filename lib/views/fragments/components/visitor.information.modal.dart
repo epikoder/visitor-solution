@@ -141,6 +141,14 @@ printTag(BuildContext buildContext, Visitor visitor) async {
                         width: 300,
                       ),
                     ),
+                    pw.Text(
+                      visitor.vid.toUpperCase(),
+                      style: pw.TextStyle(
+                        fontSize: 20,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromHex("#6d6d6d"),
+                      ),
+                    ),
                     pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [

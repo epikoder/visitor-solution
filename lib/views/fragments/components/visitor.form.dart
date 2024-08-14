@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +72,14 @@ class _Controller extends GetxController {
       };
       await Client.instance.from("visitors").insert(data);
       onSubmit(vid);
+    } on SocketException catch (_) {
+      Get.showSnackbar(
+        const GetSnackBar(
+          title: "Remote connection failed",
+          message: "Ensure settings is properly configured",
+          duration: Duration(seconds: 5),
+        ),
+      );
     } catch (e, trace) {
       logError(e, stackTrace: trace);
     }
