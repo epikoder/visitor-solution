@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:visitor_solution/models/visitor.model.dart';
@@ -38,6 +40,14 @@ class VisitorsFragmentController extends GetxController {
       }
       final vals = await query.order("created_at", ascending: false);
       visitors.value = vals.map((el) => Visitor.fromJson(el)).toList();
+    } on SocketException catch (_) {
+      Get.showSnackbar(
+        const GetSnackBar(
+          title: "Remote connection failed",
+          message: "Ensure settings is properly configured",
+          duration: Duration(seconds: 5),
+        ),
+      );
     } catch (e) {
       logError(e);
     }
