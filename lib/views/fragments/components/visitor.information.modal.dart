@@ -325,8 +325,8 @@ void _clockIn(BuildContext context, Rx<Visitor?> visitor) {
                 }
                 return v;
               }).toList();
-            } catch (e) {
-              logError(e);
+            } catch (e, stack) {
+              logError(e, stackTrace: stack);
             }
             Get.find<AppViewController>().setIsNotLoading();
           },
@@ -431,6 +431,7 @@ Modal visitorInformationModal(
             .backgroundColor(Colors.white)
             .clipRRect(all: 100)
             .padding(all: 5),
+        Styled.text(visitor.value!.vid).fontWeight(FontWeight.bold),
         _buildTile(visitor.value!.phone, CupertinoIcons.phone),
         _buildTile(
           visitor.value!.gender.string,
@@ -440,6 +441,10 @@ Modal visitorInformationModal(
         _buildTile(
           visitor.value!.department,
           Icons.place,
+        ),
+        _buildTile(
+          "${datetimeToString(visitor.value!.date)} ${visitor.value!.time != null ? visitor.value!.time?.format(context) : ""}",
+          Icons.date_range,
         ),
         Obx(
           () => _buildTile(
