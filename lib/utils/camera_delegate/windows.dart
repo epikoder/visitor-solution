@@ -60,7 +60,7 @@ class WindowsCameraDelegate extends ImagePickerCameraDelegate {
             cameraController,
             child: CameraActions(
               controller: cameraController,
-            ),
+            ).alignment(Alignment.bottomCenter),
           ).constrained(maxHeight: 500, maxWidth: 500),
           Button(
             text: "Close",
@@ -140,16 +140,3 @@ class WindowsCameraDelegate extends ImagePickerCameraDelegate {
     return controller;
   }
 }
-
-// class WindowsCameraDevice extends CameraDescription implements PlatformCameraDevice {
-//   @override
-//   String deviceId() {
-//     return super.name;
-//   }
-
-//   @override
-//   String deviceName() {
-//     return super.name;
-//   }
-  
-// }

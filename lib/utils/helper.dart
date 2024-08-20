@@ -8,6 +8,12 @@ String datetimeToString(DateTime date, {bool? showTime}) {
   return "${date.year}/${date.month > 9 ? date.month : '0${date.month}'}/${date.day > 9 ? date.day : '0${date.day}'} ${showTime != null && showTime ? TimeOfDay.fromDateTime(date).format(NavigatorService.navigatorKey.currentContext!) : ""}";
 }
 
+String timeOfDayTo24String(TimeOfDay? time) {
+  return time != null
+      ? "${time.hour > 9 ? time.hour : '0${time.hour}'}:${time.minute > 9 ? time.minute : '0${time.minute}'}:00"
+      : "";
+}
+
 String bytesToString(Uint8List bytes) {
   StringBuffer buffer = StringBuffer();
   for (int i = 0; i < bytes.length;) {

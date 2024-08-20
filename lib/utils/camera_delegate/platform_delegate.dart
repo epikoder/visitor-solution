@@ -102,7 +102,7 @@ class CameraActionsState<T> extends State<CameraActions<T>> {
           mainAxisSize: MainAxisSize.min,
         )
         .padding(vertical: 5, horizontal: 40)
-        .backgroundColor(Colors.white)
+        .backgroundColor(Colors.white.withOpacity(.2))
         .clipRRect(all: 10);
   }
 }

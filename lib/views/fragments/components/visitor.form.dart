@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:visitor_solution/models/gender.model.dart';
 import 'package:visitor_solution/models/purpose.model.dart';
+import 'package:visitor_solution/services/navigator.dart';
 import 'package:visitor_solution/utils/client.dart';
 import 'package:visitor_solution/utils/constant.dart';
 import 'package:visitor_solution/utils/helper.dart';
@@ -65,11 +68,19 @@ class _Controller extends GetxController {
         "department": department.text.trim(),
         "purpose": purpose.value.string.toLowerCase(),
         "date": datetimeToString(date.value),
-        "time": time.value?.toString(),
+        "time": time.value?.format(NavigatorService.navigatorKey.currentContext!),
         "photo": r.body,
       };
       await Client.instance.from("visitors").insert(data);
       onSubmit(vid);
+    } on SocketException catch (_) {
+      Get.showSnackbar(
+        const GetSnackBar(
+          title: "Remote connection failed",
+          message: "Ensure settings is properly configured",
+          duration: Duration(seconds: 5),
+        ),
+      );
     } catch (e, trace) {
       logError(e, stackTrace: trace);
     }

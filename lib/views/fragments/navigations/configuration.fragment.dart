@@ -129,9 +129,11 @@ class XSet extends StatelessWidget {
           ))
           .constrained(maxWidth: 400),
     ]
-        .toRow(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        .toWrap(
+          crossAxisAlignment: WrapCrossAlignment.start,
+          spacing: 50,
+          runSpacing: 10,
+
         )
         .constrained(
             maxWidth: MediaQuery.of(context).size.width -

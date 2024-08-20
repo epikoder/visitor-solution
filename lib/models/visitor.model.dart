@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:visitor_solution/models/gender.model.dart';
 import 'package:visitor_solution/models/purpose.model.dart';
+import 'package:visitor_solution/services/navigator.dart';
+import 'package:visitor_solution/utils/helper.dart';
 
 class Visitor {
   Visitor({
@@ -15,6 +18,7 @@ class Visitor {
     required this.date,
     this.clockedInAt,
     this.clockedOutAt,
+    this.time,
   });
   final String fname;
   final String lname;
@@ -25,12 +29,13 @@ class Visitor {
   final String photo;
   final String vid;
   final DateTime date;
+  final TimeOfDay? time;
   DateTime? clockedInAt;
   DateTime? clockedOutAt;
 
   String get name => "${lname.capitalizeFirst} ${fname.capitalizeFirst}";
   bool get canClockIn => clockedInAt == null;
-  bool get canClockOut => clockedOutAt == null;
+  bool get canClockOut => clockedInAt != null && clockedOutAt == null;
 
   factory Visitor.fromJson(Map<String, dynamic> data) {
     return Visitor(
@@ -38,6 +43,11 @@ class Visitor {
       lname: data['lname'],
       phone: data['phone'],
       date: DateTime.parse(data["date"]),
+      time: data["time"] != null
+          ? TimeOfDay(
+              hour: int.parse(data["time"].split(":")[0]),
+              minute: int.parse(data["time"].split(":")[1]))
+          : null,
       vid: data["vid"],
       photo: data["photo"],
       gender: Gender.fromString(data['gender'] as String),
@@ -58,6 +68,7 @@ class Visitor {
       "lname": lname,
       "phone": phone,
       "date": date.toIso8601String(),
+      "time": time != null ? timeOfDayTo24String(time) : null,
       "vid": vid,
       "photo": photo,
       "gender": gender.string.toLowerCase(),
